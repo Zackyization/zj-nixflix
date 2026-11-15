@@ -59,6 +59,14 @@
       };
       nixosModules.nixflix = self.nixosModules.default;
 
+      nixosConfigurations.mediaserver = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          self.nixosModules.default
+          ./hosts/mediaserver
+        ];
+      };
+
       packages = perSystem (
         { system, pkgs, ... }:
         (import ./docs { inherit pkgs inputs; })
