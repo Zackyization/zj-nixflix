@@ -36,6 +36,60 @@ This directory (`hosts/mediaserver/`) configures the **`garciamedia`** NixOS hos
 
 ---
 
+## Services, Ports & Network Access Reference (IP: `192.168.4.41`)
+
+### 1. Web UIs & Media Services
+
+Access these directly from any browser or client app on your local network:
+
+| Service | Port | Direct IP Address | Local Hostname Address | Default Username | Default Password | Description |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Jellyfin** | `8096` | `http://192.168.4.41:8096` | `http://garciamedia.local:8096` | `admin` | `zildjian` | Media streaming (TV, Movies, Music) |
+| **Seerr** | `5055` | `http://192.168.4.41:5055` | `http://garciamedia.local:5055` | *(Sign in with Jellyfin)* | `zildjian` | Media discovery & request manager |
+| **Sonarr** | `8989` | `http://192.168.4.41:8989` | `http://garciamedia.local:8989` | `sonarr` | `zildjian` | TV series automation & manager |
+| **Radarr** | `7878` | `http://192.168.4.41:7878` | `http://garciamedia.local:7878` | `radarr` | `zildjian` | Movie automation & manager |
+| **Prowlarr** | `9696` | `http://192.168.4.41:9696` | `http://garciamedia.local:9696` | `prowlarr` | `zildjian` | Torrent & Usenet indexer manager |
+| **qBittorrent** | `8282` | `http://192.168.4.41:8282` | `http://garciamedia.local:8282` | `admin` | `zildjian` | BitTorrent download client WebUI |
+
+> [!TIP]
+> Devices that support mDNS/Bonjour (iOS, iPadOS, macOS, Android, and Windows with mDNS) can reach these services using `http://garciamedia.local:<port>` as well as `http://192.168.4.41:<port>`.
+
+### 2. Network Hard Drive Shares (Samba / SMB)
+
+Connect from another computer to browse or transfer files:
+- **Windows**: Press `Win + R` and type `\\192.168.4.41` (or `\\garciamedia`)
+- **macOS / Linux**: In Finder, press `Cmd + K` and enter `smb://192.168.4.41` (or `smb://garciamedia.local`)
+
+| Share Name | Physical Location | Access Level | Login Credentials |
+| :--- | :--- | :--- | :--- |
+| **`Media`** | `/data/media` *(NVMe)* | **Public (Guest)** | None required |
+| **`Downloads`** | `/data/downloads` *(NVMe)* | **Public (Guest)** | None required |
+| **`SharedDrive`** | `/data` *(NVMe Root)* | Authenticated | `garciamedia` / `zildjian` |
+| **`ZeeJay_640G`** | `/mnt/drives/ZeeJay_640G` *(sda1)* | Authenticated | `garciamedia` / `zildjian` |
+| **`DESK_1TB`** | `/mnt/drives/DESK_1TB` *(sdc1)* | Authenticated | `garciamedia` / `zildjian` |
+| **`Windows`** | `/mnt/drives/Windows` *(sdb3)* | Authenticated | `garciamedia` / `zildjian` |
+| **`LinuxData`** | `/mnt/drives/LinuxData` *(sdd1)* | Authenticated | `garciamedia` / `zildjian` |
+
+### 3. Remote Administration & Desktop
+
+| Protocol / Tool | Port | Connection Target | Credentials | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| **SSH** | `22` | `ssh garciamedia@192.168.4.41` | `garciamedia` / `zildjian` | Terminal CLI & VS Code Remote |
+| **XRDP (Remote Desktop)** | `3389` | `192.168.4.41` in `mstsc.exe` | `garciamedia` / `zildjian` | Virtual XFCE desktop session |
+| **RustDesk** | `21115-21119` | Server RustDesk ID | Set in RustDesk UI | Captures physical or headless `:0` |
+
+### 4. Reverse Proxy via Caddy (Port 80)
+
+All services are accessible on HTTP port 80 with Catppuccin Mocha theming if your client PC's hosts file maps `192.168.4.41` to:
+- `http://jellyfin.nixflix.local`
+- `http://seerr.nixflix.local`
+- `http://sonarr.nixflix.local`
+- `http://radarr.nixflix.local`
+- `http://prowlarr.nixflix.local`
+- `http://qbittorrent.nixflix.local`
+
+---
+
 ## Switching Between Physical Monitor and Virtual Display
 
 `garciamedia` supports two X11 display modes via a NixOS `specialisation`:

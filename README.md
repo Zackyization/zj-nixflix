@@ -52,6 +52,26 @@ Nixflix is:
 
 - [ ] Better music tooling
 
+---
+
+## Media Server Quick Reference (`garciamedia` — `192.168.4.41`)
+
+For full host details and disk layouts, see [hosts/mediaserver/README.md](hosts/mediaserver/README.md).
+
+| Service | Port | Direct LAN URL | Default Username | Default Password | Description |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Jellyfin** | `8096` | `http://192.168.4.41:8096` | `admin` | `zildjian` | Media streaming (TV, Movies, Music) |
+| **Seerr** | `5055` | `http://192.168.4.41:5055` | *(Sign in via Jellyfin)* | `zildjian` | Media requests & discovery |
+| **Sonarr** | `8989` | `http://192.168.4.41:8989` | `sonarr` | `zildjian` | TV show automation |
+| **Radarr** | `7878` | `http://192.168.4.41:7878` | `radarr` | `zildjian` | Movie automation |
+| **Prowlarr** | `9696` | `http://192.168.4.41:9696` | `prowlarr` | `zildjian` | Indexer manager |
+| **qBittorrent** | `8282` | `http://192.168.4.41:8282` | `admin` | `zildjian` | Torrent client WebUI |
+| **Samba Shares** | `445` | `\\192.168.4.41` (Win) / `smb://192.168.4.41` (Mac) | `garciamedia` | `zildjian` | Network hard drives & media |
+| **XRDP Desktop** | `3389` | `192.168.4.41` | `garciamedia` | `zildjian` | Windows Remote Desktop (`mstsc`) |
+| **SSH** | `22` | `ssh garciamedia@192.168.4.41` | `garciamedia` | `zildjian` | Remote terminal CLI |
+
+---
+
 ## Documentation
 
 Check out the [documentation](https://kiriwalawren.github.io/nixflix/) to get started.
