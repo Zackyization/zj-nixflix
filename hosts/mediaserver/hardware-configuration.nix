@@ -1,10 +1,8 @@
-# Default hardware configuration stub for the media server.
-# When installing NixOS on the physical target PC, run:
-#   nixos-generate-config --root /mnt
-# and copy /mnt/etc/nixos/hardware-configuration.nix over this file.
+# Hardware configuration generated for garciamedia
 {
   config,
   lib,
+  pkgs,
   modulesPath,
   ...
 }:
@@ -12,7 +10,6 @@
 {
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
-  # Modules needed for NVMe, USB, SATA and AMD GPU during early boot
   boot.initrd.availableKernelModules = [
     "nvme"
     "xhci_pci"
@@ -21,27 +18,27 @@
     "usbhid"
     "sd_mod"
   ];
-  boot.initrd.kernelModules = [ "amdgpu" ];
+  boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-amd" ];
   boot.extraModulePackages = [ ];
 
-  # Root and boot partitions
-  # Replace device paths or labels with your actual partitions
   fileSystems."/" = {
-    device = lib.mkDefault "/dev/disk/by-label/nixos";
-    fsType = lib.mkDefault "ext4";
+    device = "/dev/disk/by-uuid/7105f79d-62a3-4696-9ed7-5cd83b74500c";
+    fsType = "ext4";
   };
 
   fileSystems."/boot" = {
-    device = lib.mkDefault "/dev/disk/by-label/boot";
-    fsType = lib.mkDefault "vfat";
+    device = "/dev/disk/by-uuid/E4C8-F0CA";
+    fsType = "vfat";
     options = [
-      "fmask=0022"
-      "dmask=0022"
+      "fmask=0077"
+      "dmask=0077"
     ];
   };
 
-  swapDevices = [ ];
+  swapDevices = [
+    { device = "/dev/disk/by-uuid/bf210dd8-f55b-4dcb-a970-c535930f8c09"; }
+  ];
 
   networking.useDHCP = lib.mkDefault true;
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";

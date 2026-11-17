@@ -46,7 +46,7 @@ in
       options = nonPosixOptions;
     };
 
-    "/mnt/drives/Windows" = {
+    "/mnt/drives/Windows" = {d
       device = "/dev/disk/by-uuid/680259DA0259AE36";
       fsType = "ntfs3";
       options = nonPosixOptions;
