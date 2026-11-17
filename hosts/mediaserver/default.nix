@@ -51,6 +51,9 @@
   # Allow dynamically linked binaries (needed for VS Code Remote-SSH & extensions)
   programs.nix-ld.enable = true;
 
+  # Web browser for managing web UIs locally / over RDP
+  programs.firefox.enable = true;
+
   # 6. Essential Administration & Development Tools
   environment.systemPackages = with pkgs; [
     vim
