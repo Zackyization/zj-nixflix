@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 let
   # Shared options for non-POSIX drives (exfat/ntfs3) so the 'media' group (gid 169)
   # — including garciamedia, qbittorrent, and jellyfin — has read/write access
@@ -7,6 +7,7 @@ let
     "defaults"
     "nofail"
     "x-systemd.device-timeout=5s"
+    "x-gvfs-show"
     "uid=0"
     "gid=169"
     "dmask=0002"
@@ -64,6 +65,7 @@ in
         "defaults"
         "nofail"
         "x-systemd.device-timeout=5s"
+        "x-gvfs-show"
       ];
     };
   };
@@ -164,5 +166,23 @@ in
       publish-hinfo = true;
       publish-workstation = true;
     };
+  };
+
+  # Automatically set the initial Samba password for garciamedia (matching default: "zildjian")
+  # so protected shares can be accessed from other devices (Windows / Mac) immediately
+  systemd.services.samba-init-user = {
+    description = "Ensure garciamedia has Samba password configured";
+    after = [ "samba-smbd.service" ];
+    wants = [ "samba-smbd.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      if ! ${pkgs.samba}/bin/pdbedit -u garciamedia >/dev/null 2>&1; then
+        (echo "zildjian"; echo "zildjian") | ${pkgs.samba}/bin/smbpasswd -s -a garciamedia
+      fi
+    '';
   };
 }

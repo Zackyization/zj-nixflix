@@ -48,6 +48,8 @@ in
     # Jellyfin media streaming server
     jellyfin = {
       enable = true;
+      openFirewall = true;
+      network.localNetworkAddresses = [ "0.0.0.0" ];
       apiKey = secrets.jellyfin.apiKey;
       users.admin = {
         policy.isAdministrator = true;
@@ -66,7 +68,10 @@ in
       enable = true;
       config = {
         apiKey = secrets.sonarr.apiKey;
-        hostConfig.password = secrets.sonarr.webPassword;
+        hostConfig = {
+          bindAddress = "0.0.0.0";
+          password = secrets.sonarr.webPassword;
+        };
       };
     };
 
@@ -75,7 +80,10 @@ in
       enable = true;
       config = {
         apiKey = secrets.radarr.apiKey;
-        hostConfig.password = secrets.radarr.webPassword;
+        hostConfig = {
+          bindAddress = "0.0.0.0";
+          password = secrets.radarr.webPassword;
+        };
       };
     };
 
@@ -84,7 +92,10 @@ in
       enable = true;
       config = {
         apiKey = secrets.prowlarr.apiKey;
-        hostConfig.password = secrets.prowlarr.webPassword;
+        hostConfig = {
+          bindAddress = "0.0.0.0";
+          password = secrets.prowlarr.webPassword;
+        };
       };
     };
 
@@ -97,6 +108,7 @@ in
         LegalNotice.Accepted = true;
         Preferences = {
           WebUI = {
+            Address = "*";
             Username = "admin";
             Password_PBKDF2 = secrets.qbittorrent.passwordPbkdf2;
           };
@@ -105,6 +117,9 @@ in
       };
     };
   };
+
+  # Bind Seerr to 0.0.0.0 so direct port access (5055) works from the LAN
+  systemd.services.seerr.environment.HOST = pkgs.lib.mkForce "0.0.0.0";
 
   # Open firewall for direct port access in addition to Caddy reverse proxy
   networking.firewall.allowedTCPPorts = [
