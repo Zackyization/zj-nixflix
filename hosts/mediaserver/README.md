@@ -210,11 +210,7 @@ Choose either method:
   ```
 
 ### 2. Log in to qBittorrent WebUI
-On first start (when `Password_PBKDF2` is not set in Nix), qBittorrent generates a temporary password for user `admin`. Check it on `garciamedia` with:
-```bash
-journalctl -u qbittorrent | grep -i password
-```
-*(You can change the WebUI password under **Tools → Options → Web UI** afterward, or set `serverConfig.Preferences.WebUI.Password_PBKDF2` in [media.nix](media.nix).)*
+Log in with username `admin` and password `zildjian` (configured in [secrets.nix](secrets.nix) and [media.nix](media.nix)).
 
 ### 3. Choose where the torrent saves
 In qBittorrent's **Add Torrent** dialog, set **Save at** to a local path on `garciamedia` — it will automatically appear on the corresponding network share:

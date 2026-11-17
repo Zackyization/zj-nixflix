@@ -30,4 +30,9 @@
   seerr = {
     apiKey = "seerr-api-key-32characters-long";
   };
+
+  qbittorrent = {
+    webPassword = "zildjian";
+    passwordPbkdf2 = "@ByteArray(7y/yT+nV3qJCL6UIs3UTvw==:Xf5C8UlzCanlsSnU3YSuwgt2IqBdsu316UZChTmc4TR7PgDP0cfIf1XvaOmTEe86N27puwEcARB9QCsVCYtEjw==)";
+  };
 }

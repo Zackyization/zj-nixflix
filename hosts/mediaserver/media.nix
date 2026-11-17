@@ -91,6 +91,18 @@ in
     # qBittorrent download client
     torrentClients.qbittorrent = {
       enable = true;
+      webuiPort = 8282;
+      password = secrets.qbittorrent.webPassword;
+      serverConfig = {
+        LegalNotice.Accepted = true;
+        Preferences = {
+          WebUI = {
+            Username = "admin";
+            Password_PBKDF2 = secrets.qbittorrent.passwordPbkdf2;
+          };
+          General.Locale = "en";
+        };
+      };
     };
   };
 
