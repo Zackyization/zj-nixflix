@@ -9,22 +9,22 @@
 {
   jellyfin = {
     apiKey = "jellyfin-api-key-32characters-long";
-    adminPassword = "ChangeMeAdminPassword123!";
+    adminPassword = "zildjian";
   };
 
   sonarr = {
     apiKey = "sonarr-api-key-32characters-long";
-    webPassword = "ChangeMeSonarrPass123!";
+    webPassword = "zildjian";
   };
 
   radarr = {
     apiKey = "radarr-api-key-32characters-long";
-    webPassword = "ChangeMeRadarrPass123!";
+    webPassword = "zildjian";
   };
 
   prowlarr = {
     apiKey = "prowlarr-api-key-32characters-long";
-    webPassword = "ChangeMeProwlarrPass123!";
+    webPassword = "zildjian";
   };
 
   seerr = {

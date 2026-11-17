@@ -48,10 +48,18 @@
   # Allow proprietary packages (e.g. unfree codecs / drivers)
   nixpkgs.config.allowUnfree = true;
 
-  # 6. Essential Administration Tools
+  # Allow dynamically linked binaries (needed for VS Code Remote-SSH & extensions)
+  programs.nix-ld.enable = true;
+
+  # 6. Essential Administration & Development Tools
   environment.systemPackages = with pkgs; [
     vim
     git
+    gh
+    vscode.fhs
+    antigravity-ide-fhs
+    nixd
+    nixfmt
     htop
     btop
     tmux
