@@ -70,6 +70,39 @@ Connect from another computer to browse or transfer files:
 | **`Windows`** | `/mnt/drives/Windows` *(sdb3)* | Authenticated | `garciamedia` / `zildjian` |
 | **`LinuxData`** | `/mnt/drives/LinuxData` *(sdd1)* | Authenticated | `garciamedia` / `zildjian` |
 
+#### How to Access Shared Files from a Windows PC:
+
+* **Method 1: Direct File Explorer Path (Fastest)**
+  1. On your Windows PC, press **`Windows Key + R`** to open the Run box (or click the address bar in File Explorer).
+  2. Type `\\192.168.4.41` *(or `\\garciamedia`)* and press **Enter**.
+  3. When the Windows Security prompt appears:
+     * **Username**: `garciamedia` *(or `.\garciamedia`)*
+     * **Password**: `zildjian`
+     * Check **"Remember my credentials"** so you do not have to log in again.
+  4. All shared folders and mounted hard drives will immediately appear.
+
+* **Method 2: Map as a Permanent Drive Letter (e.g. `Z:`)**
+  1. Open **File Explorer** and click **This PC** on the left sidebar.
+  2. Click the **`...`** in the top menu bar (or right-click **This PC**) and choose **Map network drive...**
+  3. Select a drive letter (e.g. `Z:`).
+  4. In the **Folder** field, enter the share you want:
+     * `\\192.168.4.41\Media` *(Media library)*
+     * `\\192.168.4.41\Downloads` *(Downloads)*
+     * `\\192.168.4.41\DESK_1TB` *(1TB SATA drive)*
+     * `\\192.168.4.41\ZeeJay_640G` *(640GB SATA drive)*
+     * `\\192.168.4.41\Windows` *(Windows partition)*
+     * `\\192.168.4.41\LinuxData` *(Linux ext4 partition)*
+  5. Check both:
+     * [x] **Reconnect at sign-in**
+     * [x] **Connect using different credentials**
+  6. Click **Finish**, enter `garciamedia` / `zildjian`, and check **"Remember my credentials"**.
+
+* **Method 3: Via Windows Network Discovery**
+  1. In File Explorer, click **Network** on the left sidebar.
+  2. If Windows displays a prompt stating *"Network discovery is turned off"*, click it and select **Turn on network discovery and file sharing**.
+  3. Under **Computers**, find **`GARCIAMEDIA`** (advertised automatically via WSDD).
+  4. Double-click it and enter your credentials (`garciamedia` / `zildjian`).
+
 ### 3. Remote Administration & Desktop
 
 | Protocol / Tool | Port | Connection Target | Credentials | Notes |
@@ -231,13 +264,11 @@ When prompted, set a password for `root`, then `reboot` and remove the USB drive
      ```
 
 4. **Shared Network Drives (SMB):**
-   First set your Samba password once on `garciamedia`:
-   ```bash
-   sudo smbpasswd -a garciamedia
-   ```
-   Then connect from Windows (`\\garciamedia\<Share>`) or macOS/Linux (`smb://garciamedia.local/<Share>`):
-   - Public (guest): `Media`, `Downloads`
-   - Authenticated (`garciamedia`): `SharedDrive`, `ZeeJay_640G`, `Windows`, `DESK_1TB`, `LinuxData`
+   The initial Samba password for `garciamedia` is automatically initialized to `zildjian` (change it anytime with `sudo smbpasswd garciamedia`).
+   Connect from Windows (`\\192.168.4.41` or `\\garciamedia`) or macOS/Linux (`smb://192.168.4.41` or `smb://garciamedia.local`):
+   - Public (guest, no password): `Media`, `Downloads`
+   - Authenticated (`garciamedia` / `zildjian`): `SharedDrive`, `ZeeJay_640G`, `Windows`, `DESK_1TB`, `LinuxData`
+   *(See [Network Hard Drive Shares (Samba / SMB)](#2-network-hard-drive-shares-samba--smb) above for full Windows mapping instructions).*
 
 ---
 
