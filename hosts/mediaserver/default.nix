@@ -7,7 +7,7 @@
   ];
 
   # 1. System Identity & Timezone
-  networking.hostName = "mediaserver";
+  networking.hostName = "garciamedia";
   time.timeZone = "Asia/Singapore";
   i18n.defaultLocale = "en_SG.UTF-8";
 
@@ -29,8 +29,8 @@
       "video" # GPU video acceleration
       "render" # GPU render devices
     ];
-    # Default initial password is "admin". Change after install with: passwd
-    initialPassword = "admin";
+    # Default initial password is "zildjian". Change after install with: passwd
+    initialPassword = "zildjian";
   };
 
   # Allow members of 'wheel' to run sudo without typing password (convenient for headless setup)

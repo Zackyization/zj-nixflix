@@ -10,9 +10,9 @@ ______________________________________________________________________
 
    - Attached drive mount at `/data` with `nofail` (won't hang boot if unmounted).
    - **Samba (SMB)** file sharing allowing Windows, Mac, and Linux systems on your local network (`192.168.4.0/22`) to access:
-     - `\\mediaserver\Media` (Public read/write access to movies, tv, music).
-     - `\\mediaserver\Downloads` (Public read/write access to torrent/usenet downloads).
-     - `\\mediaserver\SharedDrive` (Full disk access for `admin` user).
+     - `\\garciamedia\Media` (Public read/write access to movies, tv, music).
+     - `\\garciamedia\Downloads` (Public read/write access to torrent/usenet downloads).
+     - `\\garciamedia\SharedDrive` (Full disk access for `admin` user).
    - **WS-Discovery (`samba-wsdd`)**: Automatically advertises the server so it appears in Windows Explorer under "Network".
 
 1. **Remote Desktop & Headless Management (\[remote-desktop.nix\](file:///home/zeejay/Projects/zj-nixflix/hosts/mediaserver/remote-desktop.nix))**:
@@ -103,7 +103,7 @@ git add -A
 ### Step 4: Install NixOS
 
 ```bash
-nixos-install --flake .#mediaserver
+nixos-install --flake .#garciamedia
 ```
 
 When prompted, set a password for the `root` user.
@@ -124,7 +124,7 @@ When prompted, set a password for the `root` user.
 
    ```bash
    ssh admin@<IP-ADDRESS>
-   # Default password: admin
+   # Default password: zildjian
    ```
 
    *Immediately change the password by running `passwd`.*
@@ -137,5 +137,5 @@ When prompted, set a password for the `root` user.
 1. **Access Shared Network Drives**:
 
    - In Windows File Explorer, navigate to:
-     `\\<IP-ADDRESS>\Media` or `\\mediaserver\Media`
+     `\\<IP-ADDRESS>\Media` or `\\garciamedia\Media`
      `\\<IP-ADDRESS>\SharedDrive` (log in with `admin`)

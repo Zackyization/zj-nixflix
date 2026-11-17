@@ -59,7 +59,7 @@
       };
       nixosModules.nixflix = self.nixosModules.default;
 
-      nixosConfigurations.mediaserver = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.garciamedia = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           self.nixosModules.default

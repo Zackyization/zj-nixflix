@@ -22,7 +22,7 @@
       global = {
         "workgroup" = "WORKGROUP";
         "server string" = "Nixflix Media & File Server";
-        "netbios name" = "mediaserver";
+        "netbios name" = "garciamedia";
         "security" = "user";
         # Allow connections from your local subnet (covers 192.168.4.0/22: 192.168.4.1 to 192.168.7.254)
         "hosts allow" = "192.168.4. 192.168. 127.0.0.1 localhost";
