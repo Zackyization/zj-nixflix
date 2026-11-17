@@ -54,6 +54,21 @@
   # Web browser for managing web UIs locally / over RDP
   programs.firefox.enable = true;
 
+  # Keep the server online 24/7: disable all sleep/suspend/hibernation states
+  systemd.sleep.settings.Sleep = {
+    AllowSuspend = "no";
+    AllowHibernation = "no";
+    AllowHybridSleep = "no";
+    AllowSuspendThenHibernate = "no";
+  };
+
+  services.logind.settings.Login = {
+    HandleSuspendKey = "ignore";
+    HandleHibernateKey = "ignore";
+    HandleLidSwitch = "ignore";
+    IdleAction = "ignore";
+  };
+
   # 6. Essential Administration & Development Tools
   environment.systemPackages = with pkgs; [
     vim
