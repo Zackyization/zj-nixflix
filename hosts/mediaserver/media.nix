@@ -23,11 +23,11 @@ in
   nixflix = {
     enable = true;
 
-    # Media and storage directories on your attached hard drive
+    # Media and storage directories on the NVMe root drive
     mediaDir = "/data/media";
     downloadsDir = "/data/downloads";
     stateDir = "/data/.state";
-    mediaUsers = [ "admin" ];
+    mediaUsers = [ "garciamedia" ];
 
     # Unified theme across all services
     theme = {

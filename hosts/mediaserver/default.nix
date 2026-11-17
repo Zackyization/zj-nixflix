@@ -19,7 +19,7 @@
   networking.networkmanager.enable = true;
 
   # 4. User Accounts
-  users.users.admin = {
+  users.users.garciamedia = {
     isNormalUser = true;
     description = "Media Server Administrator";
     extraGroups = [

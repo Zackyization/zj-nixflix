@@ -7,22 +7,23 @@ This directory (`hosts/mediaserver/`) configures the **`garciamedia`** NixOS hos
 ## What Is Configured
 
 1. **System & Development Tools ([default.nix](default.nix))**:
-   - Hostname: `garciamedia`, user `admin` (initial password: `zildjian`, passwordless `sudo`).
+   - Hostname: `garciamedia`, user `garciamedia` (initial password: `zildjian`, passwordless `sudo`).
    - Flakes & `nix-command` enabled, `nixpkgs.config.allowUnfree = true`, and `programs.nix-ld.enable = true`.
    - Editors & tooling: **VS Code** (`vscode.fhs`), **Antigravity IDE** (`antigravity-ide-fhs`), `git`, `gh`, `nixd`, `nixfmt`.
 
 2. **Storage & Local Network Sharing ([storage.nix](storage.nix))**:
-   - Attached drive mount at `/data` (`/dev/disk/by-label/data`, `nofail` so boot succeeds even if unmounted).
+   - `/data` (`/data/media`, `/data/downloads`, `/data/.state`) lives on the NVMe root partition.
+   - Your existing SATA/USB drives are mounted non-destructively by UUID under `/mnt/drives/` (`ZeeJay_640G`, `Windows`, `DESK_1TB`, `LinuxData`) with `nofail` and a 5s device timeout.
    - **Samba (SMB)** file sharing on your local network (`192.168.4.0/22` / `192.168.0.0/16`):
-     - `\\garciamedia\Media` (public read/write access to movies, tv, music).
-     - `\\garciamedia\Downloads` (public read/write access to downloads).
-     - `\\garciamedia\SharedDrive` (full `/data` access for `admin`).
-   - **WS-Discovery (`samba-wsdd`)**: Advertises `garciamedia` under Windows Explorer "Network".
+     - `\\garciamedia\Media` (guest read/write access to `/data/media`).
+     - `\\garciamedia\Downloads` (guest read/write access to `/data/downloads`).
+     - `\\garciamedia\SharedDrive`, `\\garciamedia\ZeeJay_640G`, `\\garciamedia\Windows`, `\\garciamedia\DESK_1TB`, `\\garciamedia\LinuxData` (protected; log in as `garciamedia` after setting your SMB password with `sudo smbpasswd -a garciamedia`).
+   - **WS-Discovery (`samba-wsdd`) & Avahi (`mDNS`)**: Advertises `garciamedia` to Windows Explorer ("Network") and `garciamedia.local` to macOS Finder / Linux file managers.
 
 3. **Remote Desktop & Display Modes ([remote-desktop.nix](remote-desktop.nix))**:
-   - **SSH**: Remote CLI & VS Code Remote-SSH access (`ssh admin@<ip>`).
-   - **XFCE + LightDM**: Lightweight desktop environment with `admin` auto-login.
-   - **XRDP (Windows Remote Desktop)**: Connect with Windows **Remote Desktop Connection** (`mstsc`) as `admin`. Spawns its own virtual X11 session on demand (works in both physical monitor and headless modes).
+   - **SSH**: Remote CLI & VS Code Remote-SSH access (`ssh garciamedia@<ip>`).
+   - **XFCE + LightDM**: Lightweight desktop environment with `garciamedia` auto-login.
+   - **XRDP (Windows Remote Desktop)**: Connect with Windows **Remote Desktop Connection** (`mstsc`) as `garciamedia`. Spawns its own virtual X11 session on demand (works in both physical monitor and headless modes).
    - **RustDesk**: Daemon + tray autostart with firewall ports open (`21115-21119` TCP, `21116` UDP).
    - **Dual Display Modes (`specialisation.headless`)**: Physical monitor output by default, plus an on-demand `headless` virtual 1080p `dummy` display specialisation (see [Switching Between Physical Monitor and Virtual Display](#switching-between-physical-monitor-and-virtual-display)).
 
@@ -31,7 +32,7 @@ This directory (`hosts/mediaserver/`) configures the **`garciamedia`** NixOS hos
    - **Jellyfin**, **Seerr**, **Sonarr**, **Radarr**, **Prowlarr**, **qBittorrent**, **PostgreSQL**, and **Caddy** (`http://<service>.nixflix.local` and direct ports `:8096`, `:5055`, `:8989`, `:7878`, `:9696`, `:8282`).
 
 5. **Secrets & Passwords ([secrets.nix](secrets.nix))**:
-   - Initial API keys and service web passwords (default `"zildjian"`). Change these before exposing anything outside your LAN.
+   - Initial API keys and service web passwords (default `"zildjian"` — Jellyfin web login user is `admin`). Change these before exposing anything outside your LAN.
 
 ---
 
@@ -83,7 +84,6 @@ This directory (`hosts/mediaserver/`) configures the **`garciamedia`** NixOS hos
    ```bash
    cp /etc/nixos/hardware-configuration.nix /etc/nixos/zj-nixflix/hosts/mediaserver/hardware-configuration.nix
    ```
-   *(If you have a separate media drive, check `lsblk -f` and make sure it is ext4-formatted with label `data`, or update [storage.nix](storage.nix) to use its UUID.)*
 
 4. **Stage files and switch to the flake**:
    ```bash
@@ -92,13 +92,13 @@ This directory (`hosts/mediaserver/`) configures the **`garciamedia`** NixOS hos
    sudo env NIX_CONFIG="experimental-features = nix-command flakes" nixos-rebuild switch --flake .#garciamedia
    ```
 
-5. **Reboot and set `admin` ownership for remote editing**:
+5. **Reboot and verify repo ownership for `garciamedia`**:
    ```bash
    sudo reboot
    ```
-   After logging in as `admin` (password: `zildjian`), run:
+   After logging in as `garciamedia`, ensure `garciamedia` owns the repo for remote editing:
    ```bash
-   sudo chown -R admin:users /etc/nixos/zj-nixflix
+   sudo chown -R garciamedia:users /etc/nixos/zj-nixflix
    ```
 
 ---
@@ -157,18 +157,18 @@ When prompted, set a password for `root`, then `reboot` and remove the USB drive
 
 1. **SSH:**
    ```bash
-   ssh admin@<IP-ADDRESS>
+   ssh garciamedia@<IP-ADDRESS>
    # Initial password: zildjian
    ```
    *(Change your Linux password with `passwd`.)*
 
 2. **Remote Desktop:**
-   - **Windows RDP (`mstsc`):** Connect to `<IP-ADDRESS>` with username `admin` (always creates a virtual session, even in physical monitor mode).
+   - **Windows RDP (`mstsc`):** Connect to `<IP-ADDRESS>` with username `garciamedia` (always creates a virtual session, even in physical monitor mode).
    - **RustDesk:** Connect using the server's RustDesk ID (switch to the `headless` specialisation if no monitor is plugged in).
 
 3. **VS Code & Antigravity IDE:**
    - **Inside RDP / RustDesk:** Launch `antigravity` or `code /etc/nixos/zj-nixflix`.
-   - **Via Remote-SSH:** Connect from another computer to `admin@garciamedia` (or `admin@<IP-ADDRESS>`) and open `/etc/nixos/zj-nixflix`.
+   - **Via Remote-SSH:** Connect from another computer to `garciamedia@garciamedia` (or `garciamedia@<IP-ADDRESS>`) and open `/etc/nixos/zj-nixflix`.
    - **Apply configuration changes:**
      ```bash
      cd /etc/nixos/zj-nixflix
@@ -177,6 +177,52 @@ When prompted, set a password for `root`, then `reboot` and remove the USB drive
      ```
 
 4. **Shared Network Drives (SMB):**
-   - `\\<IP-ADDRESS>\Media` or `\\garciamedia\Media`
-   - `\\<IP-ADDRESS>\Downloads` or `\\garciamedia\Downloads`
-   - `\\<IP-ADDRESS>\SharedDrive` (log in as `admin`)
+   First set your Samba password once on `garciamedia`:
+   ```bash
+   sudo smbpasswd -a garciamedia
+   ```
+   Then connect from Windows (`\\garciamedia\<Share>`) or macOS/Linux (`smb://garciamedia.local/<Share>`):
+   - Public (guest): `Media`, `Downloads`
+   - Authenticated (`garciamedia`): `SharedDrive`, `ZeeJay_640G`, `Windows`, `DESK_1TB`, `LinuxData`
+
+---
+
+## Downloading Torrents from Another PC (Remote qBittorrent WebUI)
+
+Instead of downloading torrents over SMB from another desktop, open **`garciamedia`'s own qBittorrent WebUI** in your browser so `garciamedia` writes directly to its local drives (even if your other PC sleeps or shuts down).
+
+### 1. Open qBittorrent WebUI from another desktop on your LAN
+Choose either method:
+
+- **Option A — Via Caddy (`http://qbittorrent.nixflix.local`, zero server config changes):**
+  On your client PC, add a line to its `hosts` file (`C:\Windows\System32\drivers\etc\hosts` on Windows as Administrator, or `/etc/hosts` on macOS/Linux):
+  ```text
+  <GARCIAMEDIA-IP>  qbittorrent.nixflix.local jellyfin.nixflix.local seerr.nixflix.local sonarr.nixflix.local radarr.nixflix.local prowlarr.nixflix.local
+  ```
+  Then open `http://qbittorrent.nixflix.local` in your browser.
+
+- **Option B — Direct port (`http://<GARCIAMEDIA-IP>:8282` or `http://garciamedia.local:8282`):**
+  By default qBittorrent binds only to `127.0.0.1` (for Caddy). To allow direct LAN access on port `8282`, add `serverConfig.Preferences.WebUI.Address = "*";` inside `torrentClients.qbittorrent` in [media.nix](media.nix), then run:
+  ```bash
+  cd /etc/nixos/zj-nixflix
+  git add -A
+  sudo nixos-rebuild switch --flake .#garciamedia
+  ```
+
+### 2. Log in to qBittorrent WebUI
+On first start (when `Password_PBKDF2` is not set in Nix), qBittorrent generates a temporary password for user `admin`. Check it on `garciamedia` with:
+```bash
+journalctl -u qbittorrent | grep -i password
+```
+*(You can change the WebUI password under **Tools → Options → Web UI** afterward, or set `serverConfig.Preferences.WebUI.Password_PBKDF2` in [media.nix](media.nix).)*
+
+### 3. Choose where the torrent saves
+In qBittorrent's **Add Torrent** dialog, set **Save at** to a local path on `garciamedia` — it will automatically appear on the corresponding network share:
+
+| qBittorrent **Save at** path | Visible on the network at |
+| --- | --- |
+| `/data/downloads/torrent/default` *(default)* | `\\garciamedia\Downloads\torrent\default` |
+| `/mnt/drives/ZeeJay_640G` | `\\garciamedia\ZeeJay_640G` |
+| `/mnt/drives/DESK_1TB` | `\\garciamedia\DESK_1TB` |
+| `/mnt/drives/Windows` | `\\garciamedia\Windows` |
+| `/mnt/drives/LinuxData/<writable-folder>` | `\\garciamedia\LinuxData\<writable-folder>` |

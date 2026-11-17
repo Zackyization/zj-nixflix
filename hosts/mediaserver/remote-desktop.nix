@@ -57,10 +57,10 @@
     };
   };
 
-  # Auto-login to the admin session on boot
+  # Auto-login to the garciamedia session on boot
   services.displayManager.autoLogin = {
     enable = true;
-    user = "admin";
+    user = "garciamedia";
   };
 
   # 4. XRDP (Windows Remote Desktop Protocol)
