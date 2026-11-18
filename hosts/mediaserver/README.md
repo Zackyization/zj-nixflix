@@ -123,35 +123,36 @@ All services are accessible on HTTP port 80 with Catppuccin Mocha theming if you
 
 ---
 
-## Switching Between Physical Monitor and Virtual Display
+## Headless Remote Access & Display Modes
 
-`garciamedia` supports two X11 display modes via a NixOS `specialisation`:
+You have two different ways to connect to the desktop remotely when running headless (without a physical monitor):
 
-| Mode | When to use | How X11 / Remote Desktop behaves |
-| --- | --- | --- |
-| **Physical Monitor** *(default)* | Monitor plugged into the PC | XFCE renders on your physical display. **XRDP (`mstsc`)** still spawns virtual sessions on demand. |
-| **Virtual Display (`headless`)** | No monitor plugged in (for **RustDesk** capture on `:0`) | Uses the Xorg `dummy` driver (`1920x1080` in RAM). Physical monitor outputs will not display LightDM/XFCE while active. |
+### Method 1: Windows Remote Desktop / XRDP (Easiest — No Setup Needed!)
+- **XRDP is already active on port `3389`**.
+- It creates its own dedicated virtual X11 session on demand whenever you connect.
+- **You do NOT need to switch to headless mode or unplug anything**. It works in both physical monitor and headless setups automatically!
+- On any Windows PC:
+  1. Press `Win + R`, type `mstsc`, and press **Enter**.
+  2. Enter Computer: `192.168.4.41`
+  3. Log in with Username: `garciamedia` and your Linux password.
 
-> [!NOTE]
-> Switching modes restarts `display-manager.service`, which logs out/restarts the local graphical `:0` session.
+---
 
-### Switch TO the Virtual Dummy Display (`headless`)
-- **Live (without rebooting):**
-  ```bash
-  sudo /nix/var/nix/profiles/system/specialisation/headless/bin/switch-to-configuration switch
-  ```
-- **At boot:** Select the **`headless`** entry in the `systemd-boot` menu.
+### Method 2: RustDesk (Remote Desktop on Display `:0`)
 
-### Switch BACK to the Physical Monitor (default)
-- **Live (without rebooting or rebuilding):**
-  ```bash
-  sudo /nix/var/nix/profiles/system/bin/switch-to-configuration switch
-  ```
-- **Or by rebuilding the default flake target:**
-  ```bash
-  sudo nixos-rebuild switch --flake /etc/nixos/zj-nixflix#garciamedia
-  ```
-- **At boot:** Reboot and select the default (`garciamedia`) boot entry.
+RustDesk captures the system's primary display (`:0`). If no physical monitor is plugged into the motherboard, the graphics card reports `0 active displays`, causing RustDesk to show **"no display"**.
+
+To solve this, `garciamedia` includes automated commands to switch between physical monitor and virtual dummy display modes:
+
+| Command | What it does |
+| --- | --- |
+| `sudo headless-on` | Switches to the virtual 1080p dummy display, restarts LightDM and RustDesk. Ready for remote access without a monitor! |
+| `sudo headless-off` | Switches back to your physical monitor (HDMI/DP) and restarts LightDM and RustDesk. |
+
+> [!TIP]
+> **Best Long-Term Hardware Solution ($3 HDMI Dummy Plug):**
+> If you plan to run this PC as a permanent headless server, consider buying an **HDMI Dummy Plug / Headless Ghost** (cost is around \$3 on Amazon/eBay/Shopee). 
+> Plugging this tiny adapter into the motherboard keeps the AMD Radeon GPU hardware acceleration (VA-API for Jellyfin and RustDesk) permanently active at 1080p/4K without needing any software switching scripts or dummy drivers!
 
 ---
 

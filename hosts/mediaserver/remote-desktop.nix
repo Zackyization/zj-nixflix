@@ -19,63 +19,51 @@
   };
 
   # 3. Headless Virtual Display Specialisation
-  # Switch to the virtual dummy display when running without a physical monitor attached (e.g. for RustDesk):
-  #   sudo /nix/var/nix/profiles/system/specialisation/headless/bin/switch-to-configuration switch
-  # Or choose the "headless" entry in the boot menu.
-  # Switch back to physical monitor mode anytime without rebooting:
-  #   sudo /nix/var/nix/profiles/system/bin/switch-to-configuration switch
-  # Or rebuild the default config:
-  #   sudo nixos-rebuild switch --flake /etc/nixos/zj-nixflix#garciamedia
+  # Allows running RustDesk without any physical monitor plugged in.
+  # Use the helper commands:
+  #   sudo headless-on   (switches to virtual 1080p dummy display & restarts display manager)
+  #   sudo headless-off  (switches back to physical HDMI/DP monitor)
   specialisation.headless.configuration = {
     services.xserver = {
       videoDrivers = lib.mkForce [ "dummy" ];
-      config = ''
-        Section "Device"
-          Identifier "VirtualDummyDevice"
-          Driver "dummy"
-          VideoRam 256000
-        EndSection
-
-        Section "Monitor"
-          Identifier "VirtualDummyMonitor"
-          HorizSync 28.0-80.0
-          VertRefresh 48.0-75.0
-          Modeline "1920x1080_60.00" 173.00 1920 2048 2248 2576 1080 1083 1088 1120 -hsync +vsync
-        EndSection
-
-        Section "Screen"
-          Identifier "VirtualDummyScreen"
-          Device "VirtualDummyDevice"
-          Monitor "VirtualDummyMonitor"
-          DefaultDepth 24
-          SubSection "Display"
-            Depth 24
-            Modes "1920x1080"
-          EndSubSection
-        EndSection
+      deviceSection = ''
+        VideoRam 256000
+      '';
+      monitorSection = ''
+        HorizSync 28.0-80.0
+        VertRefresh 48.0-75.0
+        Modeline "1920x1080_60.00" 173.00 1920 2048 2248 2576 1080 1083 1088 1120 -hsync +vsync
+      '';
+      screenSection = ''
+        DefaultDepth 24
+        SubSection "Display"
+          Depth 24
+          Modes "1920x1080"
+        EndSubSection
       '';
     };
   };
 
-  # Auto-login to the garciamedia session on boot
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = "garciamedia";
-  };
-
-  # 4. XRDP (Windows Remote Desktop Protocol)
-  # Allows connecting directly from any Windows PC using the built-in "Remote Desktop Connection" (mstsc)
-  # Creates its own virtual display session on demand with no monitor required.
-  services.xrdp = {
-    enable = true;
-    defaultWindowManager = "xfce4-session";
-    openFirewall = true;
-  };
-
-  # 5. RustDesk Remote Desktop
+  # Helper scripts for seamless headless switching
   environment.systemPackages = with pkgs; [
     rustdesk-flutter
     xclip # clipboard support
+    (pkgs.writeShellScriptBin "headless-on" ''
+      echo "=== Switching to Headless (Virtual Display) Mode ==="
+      /nix/var/nix/profiles/system/specialisation/headless/bin/switch-to-configuration switch
+      echo "Restarting display manager for virtual display..."
+      systemctl restart display-manager.service
+      systemctl restart rustdesk.service
+      echo "=== Headless mode active (Virtual 1920x1080 on :0) ==="
+    '')
+    (pkgs.writeShellScriptBin "headless-off" ''
+      echo "=== Switching to Physical Monitor Mode ==="
+      /nix/var/nix/profiles/system/bin/switch-to-configuration switch
+      echo "Restarting display manager for physical monitor..."
+      systemctl restart display-manager.service
+      systemctl restart rustdesk.service
+      echo "=== Physical monitor mode active ==="
+    '')
   ];
 
   # RustDesk background service
