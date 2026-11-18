@@ -18,6 +18,15 @@
     displayManager.lightdm.enable = true;
   };
 
+  # Auto-login to desktop session for headless / remote operation
+  services.displayManager = {
+    autoLogin = {
+      enable = true;
+      user = "garciamedia";
+    };
+    defaultSession = "xfce";
+  };
+
   # 3. Headless Virtual Display Specialisation
   # Allows running RustDesk without any physical monitor plugged in.
   # Use the helper commands:
