@@ -82,6 +82,7 @@ in
         apiKey = secrets.radarr.apiKey;
         hostConfig = {
           bindAddress = "0.0.0.0";
+          username = "admin";
           password = secrets.radarr.webPassword;
         };
       };

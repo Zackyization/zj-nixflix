@@ -47,7 +47,7 @@ Access these directly from any browser or client app on your local network:
 | **Jellyfin** | `8096` | `http://192.168.4.41:8096` | `http://garciamedia.local:8096` | `admin` | `zildjian` | Media streaming (TV, Movies, Music) |
 | **Seerr** | `5055` | `http://192.168.4.41:5055` | `http://garciamedia.local:5055` | *(Sign in with Jellyfin)* | `zildjian` | Media discovery & request manager |
 | **Sonarr** | `8989` | `http://192.168.4.41:8989` | `http://garciamedia.local:8989` | `sonarr` | `zildjian` | TV series automation & manager |
-| **Radarr** | `7878` | `http://192.168.4.41:7878` | `http://garciamedia.local:7878` | `radarr` | `zildjian` | Movie automation & manager |
+| **Radarr** | `7878` | `http://192.168.4.41:7878` | `http://garciamedia.local:7878` | `admin` | `zildjian` | Movie automation & manager |
 | **Prowlarr** | `9696` | `http://192.168.4.41:9696` | `http://garciamedia.local:9696` | `prowlarr` | `zildjian` | Torrent & Usenet indexer manager |
 | **qBittorrent** | `8282` | `http://192.168.4.41:8282` | `http://garciamedia.local:8282` | `admin` | `zildjian` | BitTorrent download client WebUI |
 
