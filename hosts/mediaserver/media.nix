@@ -70,6 +70,7 @@ in
         apiKey = secrets.sonarr.apiKey;
         hostConfig = {
           bindAddress = "0.0.0.0";
+          username = "admin";
           password = secrets.sonarr.webPassword;
         };
       };
@@ -95,6 +96,7 @@ in
         apiKey = secrets.prowlarr.apiKey;
         hostConfig = {
           bindAddress = "0.0.0.0";
+          username = "admin";
           password = secrets.prowlarr.webPassword;
         };
       };

@@ -46,9 +46,9 @@ Access these directly from any browser or client app on your local network:
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Jellyfin** | `8096` | `http://192.168.4.41:8096` | `http://garciamedia.local:8096` | `admin` | `zildjian` | Media streaming (TV, Movies, Music) |
 | **Seerr** | `5055` | `http://192.168.4.41:5055` | `http://garciamedia.local:5055` | *(Sign in with Jellyfin)* | `zildjian` | Media discovery & request manager |
-| **Sonarr** | `8989` | `http://192.168.4.41:8989` | `http://garciamedia.local:8989` | `sonarr` | `zildjian` | TV series automation & manager |
+| **Sonarr** | `8989` | `http://192.168.4.41:8989` | `http://garciamedia.local:8989` | `admin` | `zildjian` | TV series automation & manager |
 | **Radarr** | `7878` | `http://192.168.4.41:7878` | `http://garciamedia.local:7878` | `admin` | `zildjian` | Movie automation & manager |
-| **Prowlarr** | `9696` | `http://192.168.4.41:9696` | `http://garciamedia.local:9696` | `prowlarr` | `zildjian` | Torrent & Usenet indexer manager |
+| **Prowlarr** | `9696` | `http://192.168.4.41:9696` | `http://garciamedia.local:9696` | `admin` | `zildjian` | Torrent & Usenet indexer manager |
 | **qBittorrent** | `8282` | `http://192.168.4.41:8282` | `http://garciamedia.local:8282` | `admin` | `zildjian` | BitTorrent download client WebUI |
 
 > [!TIP]
@@ -130,7 +130,7 @@ All services (`Seerr`, `Radarr`, `Sonarr`, `Prowlarr`, `qBittorrent`, and `Jelly
 ### One-Time Setup: Add Torrent Indexers in Prowlarr
 Nixflix pre-connects Prowlarr to Radarr and Sonarr, so you only need to add your torrent sites once:
 
-1. Open **Prowlarr** (`http://192.168.4.41:9696` or `http://garciamedia.local:9696`) and sign in (`prowlarr` / `zildjian`).
+1. Open **Prowlarr** (`http://192.168.4.41:9696` or `http://garciamedia.local:9696`) and sign in (`admin` / `zildjian`).
 2. Go to **Indexers → Add Indexer**, pick the torrent sites you use, click **Test**, and **Save**.
 3. Go to **Settings → Apps → Sync App Indexers** to push those indexers into **Radarr** and **Sonarr**.
 
