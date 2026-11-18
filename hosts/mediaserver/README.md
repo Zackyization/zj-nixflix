@@ -123,6 +123,58 @@ All services are accessible on HTTP port 80 with Catppuccin Mocha theming if you
 
 ---
 
+## Media Stack Workflows & Examples
+
+All services (`Seerr`, `Radarr`, `Sonarr`, `Prowlarr`, `qBittorrent`, and `Jellyfin`) are already wired together. Follow the one-time Prowlarr setup below to unlock automated requests, or use qBittorrent directly for manual downloads.
+
+### One-Time Setup: Add Torrent Indexers in Prowlarr
+Nixflix pre-connects Prowlarr to Radarr and Sonarr, so you only need to add your torrent sites once:
+
+1. Open **Prowlarr** (`http://192.168.4.41:9696` or `http://garciamedia.local:9696`) and sign in (`prowlarr` / `zildjian`).
+2. Go to **Indexers → Add Indexer**, pick the torrent sites you use, click **Test**, and **Save**.
+3. Go to **Settings → Apps → Sync App Indexers** to push those indexers into **Radarr** and **Sonarr**.
+
+---
+
+### Workflow 1: Automated Movies & TV Shows (Seerr → Starr → qBittorrent → Jellyfin)
+Use this when you want a "search and click Request" Netflix-style experience:
+
+1. Open **Seerr** (`http://192.168.4.41:5055` or `http://garciamedia.local:5055`) and sign in with your Jellyfin account (`admin` / `zildjian`).
+2. Search for any movie or TV series (for example, *Inception* or *Severance*) and click **Request**.
+3. Behind the scenes, the stack automatically:
+   - Sends movies to **Radarr** (`:7878`) or TV shows to **Sonarr** (`:8989`).
+   - Queries your **Prowlarr** indexers and sends the best matching torrent to **qBittorrent**.
+   - Downloads into `/data/downloads/torrent/radarr` or `/data/downloads/torrent/sonarr`.
+   - Hardlinks and renames the clean media file into `/data/media/movies` or `/data/media/tv` (keeping seeding intact without using double disk space).
+   - Scans it into **Jellyfin** so it is ready to watch.
+
+> [!TIP]
+> Want to hand-pick a specific torrent release (e.g. a particular codec, sub group, or 1080p/4K encode)? Open **Radarr** (`http://192.168.4.41:7878`) or **Sonarr** (`http://192.168.4.41:8989`), select the title, and click **Interactive Search**.
+
+---
+
+### Workflow 2: Manual Torrents in qBittorrent (Custom Magnets & Choosing Any Folder)
+Use this for non-media files (ISOs, software, archives) or magnets you want to manage yourself:
+
+1. Open **qBittorrent** (`http://192.168.4.41:8282` or `http://garciamedia.local:8282`) and log in (`admin` / `zildjian`).
+2. Add a `.torrent` file or magnet link.
+3. **Choosing where it downloads:**
+   By default, **Torrent Management Mode** is set to **`Automatic`**, which locks the **Save files to location** box to category folders (`radarr`, `sonarr`, `prowlarr`).
+   - To pick any custom folder (like `/data/media/movies` or one of your extra drives), change **Torrent Management Mode** from **`Automatic`** to **`Manual`** in the **Add Torrent** dialog.
+   - Example destinations:
+     - General files: `/data/downloads/torrent/default` *(visible at `\\192.168.4.41\Downloads\torrent\default`)*
+     - Extra drives: `/mnt/drives/DESK_1TB` or `/mnt/drives/ZeeJay_640G` *(visible at `\\192.168.4.41\DESK_1TB` / `\\192.168.4.41\ZeeJay_640G`)*
+     - Direct media drop: `/data/media/movies` or `/data/media/tv` *(or download to `/data/downloads/torrent/default` and use **Radarr / Sonarr → Wanted → Manual Import** so it gets cleanly renamed for Jellyfin)*
+
+---
+
+### Workflow 3: Watching & Sharing in Jellyfin
+1. Open **Jellyfin** in a browser (`http://192.168.4.41:8096` or `http://garciamedia.local:8096`) or install the Jellyfin app on your TV, phone, or other PC and connect to `http://192.168.4.41:8096`.
+2. Sign in as `admin` / `zildjian`. Your **Movies** (`/data/media/movies`) and **Shows** (`/data/media/tv`) libraries are already configured.
+3. *(Optional)* In Jellyfin **Dashboard → Users**, create separate accounts for family/housemates — they can also sign in to **Seerr** with those Jellyfin accounts to request shows on their own.
+
+---
+
 ## Headless Remote Access & Display Modes
 
 You have two different ways to connect to the desktop remotely when running headless (without a physical monitor):
@@ -278,28 +330,18 @@ When prompted, set a password for `root`, then `reboot` and remove the USB drive
 Instead of downloading torrents over SMB from another desktop, open **`garciamedia`'s own qBittorrent WebUI** in your browser so `garciamedia` writes directly to its local drives (even if your other PC sleeps or shuts down).
 
 ### 1. Open qBittorrent WebUI from another desktop on your LAN
-Choose either method:
-
-- **Option A — Via Caddy (`http://qbittorrent.nixflix.local`, zero server config changes):**
-  On your client PC, add a line to its `hosts` file (`C:\Windows\System32\drivers\etc\hosts` on Windows as Administrator, or `/etc/hosts` on macOS/Linux):
+- **Direct access (already enabled):** Open `http://192.168.4.41:8282` or `http://garciamedia.local:8282` in your browser.
+- **Via Caddy (`http://qbittorrent.nixflix.local`):** On your client PC, add a line to its `hosts` file (`C:\Windows\System32\drivers\etc\hosts` on Windows as Administrator, or `/etc/hosts` on macOS/Linux):
   ```text
-  <GARCIAMEDIA-IP>  qbittorrent.nixflix.local jellyfin.nixflix.local seerr.nixflix.local sonarr.nixflix.local radarr.nixflix.local prowlarr.nixflix.local
+  192.168.4.41  qbittorrent.nixflix.local jellyfin.nixflix.local seerr.nixflix.local sonarr.nixflix.local radarr.nixflix.local prowlarr.nixflix.local
   ```
   Then open `http://qbittorrent.nixflix.local` in your browser.
-
-- **Option B — Direct port (`http://<GARCIAMEDIA-IP>:8282` or `http://garciamedia.local:8282`):**
-  By default qBittorrent binds only to `127.0.0.1` (for Caddy). To allow direct LAN access on port `8282`, add `serverConfig.Preferences.WebUI.Address = "*";` inside `torrentClients.qbittorrent` in [media.nix](media.nix), then run:
-  ```bash
-  cd /etc/nixos/zj-nixflix
-  git add -A
-  sudo nixos-rebuild switch --flake .#garciamedia
-  ```
 
 ### 2. Log in to qBittorrent WebUI
 Log in with username `admin` and password `zildjian` (configured in [secrets.nix](secrets.nix) and [media.nix](media.nix)).
 
 ### 3. Choose where the torrent saves
-In qBittorrent's **Add Torrent** dialog, set **Save at** to a local path on `garciamedia` — it will automatically appear on the corresponding network share:
+In qBittorrent's **Add Torrent** dialog, switch **Torrent Management Mode** from **`Automatic`** to **`Manual`** to unlock **Save files to location**, then set it to a local path on `garciamedia` — it will automatically appear on the corresponding network share:
 
 | qBittorrent **Save at** path | Visible on the network at |
 | --- | --- |
