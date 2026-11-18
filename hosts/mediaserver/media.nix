@@ -89,6 +89,9 @@ in
       };
     };
 
+    # FlareSolverr: Cloudflare challenge solver proxy for Prowlarr indexers
+    flaresolverr.enable = true;
+
     # Prowlarr: Torrent & Usenet indexer manager
     prowlarr = {
       enable = true;
@@ -99,6 +102,17 @@ in
           username = "admin";
           password = secrets.prowlarr.webPassword;
         };
+        indexers = map (name: {
+          inherit name;
+          tags = [ "flaresolverr" ];
+        }) [
+          "1337x"
+          "The Pirate Bay"
+          "YTS"
+          "EZTV"
+          "Knaben"
+          "Nyaa.si"
+        ];
       };
     };
 

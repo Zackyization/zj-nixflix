@@ -29,7 +29,7 @@ This directory (`hosts/mediaserver/`) configures the **`garciamedia`** NixOS hos
 
 4. **Media Stack & AMD GPU Acceleration ([media.nix](media.nix))**:
    - AMD VA-API hardware transcoding support (`hardware.graphics`, `jellyfin` in `video`/`render` groups).
-   - **Jellyfin**, **Seerr**, **Sonarr**, **Radarr**, **Prowlarr**, **qBittorrent**, **PostgreSQL**, and **Caddy** (`http://<service>.nixflix.local` and direct ports `:8096`, `:5055`, `:8989`, `:7878`, `:9696`, `:8282`).
+   - **Jellyfin**, **Seerr**, **Sonarr**, **Radarr**, **Prowlarr** (with `1337x`, `The Pirate Bay`, `YTS`, `EZTV`, `Knaben`, `Nyaa.si`), **FlareSolverr**, **qBittorrent**, **PostgreSQL**, and **Caddy** (`http://<service>.nixflix.local` and direct ports `:8096`, `:5055`, `:8989`, `:7878`, `:9696`, `:8282`).
 
 5. **Secrets & Passwords ([secrets.nix](secrets.nix))**:
    - Initial API keys and service web passwords (default `"zildjian"` — Jellyfin web login user is `admin`). Change these before exposing anything outside your LAN.
@@ -127,12 +127,15 @@ All services are accessible on HTTP port 80 with Catppuccin Mocha theming if you
 
 All services (`Seerr`, `Radarr`, `Sonarr`, `Prowlarr`, `qBittorrent`, and `Jellyfin`) are already wired together. Follow the one-time Prowlarr setup below to unlock automated requests, or use qBittorrent directly for manual downloads.
 
-### One-Time Setup: Add Torrent Indexers in Prowlarr
-Nixflix pre-connects Prowlarr to Radarr and Sonarr, so you only need to add your torrent sites once:
+### Declarative Indexers in Prowlarr
+[media.nix](media.nix) pre-configures **`1337x`**, **`The Pirate Bay`**, **`YTS`**, **`EZTV`**, **`Knaben`**, and **`Nyaa.si`** with **FlareSolverr** (`flaresolverr` tag) and syncs them to Radarr and Sonarr.
 
+*(Note: `prowlarr-indexers.service` removes any UI-added indexer not listed in [media.nix](media.nix) on rebuild/reboot, so always add new indexers in `prowlarr.config.indexers`.)*
+
+To verify indexer reachability on your network:
 1. Open **Prowlarr** (`http://192.168.4.41:9696` or `http://garciamedia.local:9696`) and sign in (`admin` / `zildjian`).
-2. Go to **Indexers → Add Indexer**, pick the torrent sites you use, click **Test**, and **Save**.
-3. Go to **Settings → Apps → Sync App Indexers** to push those indexers into **Radarr** and **Sonarr**.
+2. Under **Indexers**, click **Test All Indexers** to check which ones your ISP reaches directly or via FlareSolverr.
+3. Click **Settings → Apps → Sync App Indexers** if you want to trigger an immediate sync to **Radarr** and **Sonarr**.
 
 ---
 
