@@ -3,7 +3,20 @@ let
   # Shared options for non-POSIX drives (exfat/ntfs3) so the 'media' group (gid 169)
   # — including garciamedia, qbittorrent, and jellyfin — has read/write access
   # without touching existing drive contents.
-  nonPosixOptions = [
+  # Mount options for exFAT drives (in-kernel driver does not accept iocharset)
+  exfatOptions = [
+    "defaults"
+    "nofail"
+    "x-systemd.device-timeout=5s"
+    "x-gvfs-show"
+    "uid=0"
+    "gid=169"
+    "dmask=0002"
+    "fmask=0113"
+  ];
+
+  # Mount options for NTFS3 (Windows partition)
+  ntfsOptions = [
     "defaults"
     "nofail"
     "x-systemd.device-timeout=5s"
@@ -13,6 +26,7 @@ let
     "dmask=0002"
     "fmask=0113"
     "iocharset=utf8"
+    "windows_names"
   ];
 
   mkUserShare =
@@ -37,25 +51,24 @@ in
   # Enable kernel NTFS (ntfs3) support for the Windows partition
   boot.supportedFilesystems = [ "ntfs" ];
 
-  # Mount existing SATA/USB drives under /mnt/drives without modifying or formatting them.
-  # /data remains on the NVMe root partition (nvme0n1p2).
+  # 1. Mount existing SATA/USB drives under /mnt/drives without modifying or formatting them.
   fileSystems = {
     "/mnt/drives/ZeeJay_640G" = {
       device = "/dev/disk/by-uuid/BC1B-EE38";
       fsType = "exfat";
-      options = nonPosixOptions;
+      options = exfatOptions;
     };
 
     "/mnt/drives/Windows" = {
       device = "/dev/disk/by-uuid/680259DA0259AE36";
       fsType = "ntfs3";
-      options = nonPosixOptions;
+      options = ntfsOptions;
     };
 
     "/mnt/drives/DESK_1TB" = {
       device = "/dev/disk/by-uuid/B4B7-7594";
       fsType = "exfat";
-      options = nonPosixOptions;
+      options = exfatOptions;
     };
 
     "/mnt/drives/LinuxData" = {
@@ -68,7 +81,28 @@ in
         "x-gvfs-show"
       ];
     };
+
+    # 2. MergerFS Unified Pool combining all storage drives into /mnt/storage
+    # Writes automatically balance to the drive with the most free space (category.create=mfs)
+    # Automatically skips any drive with less than 20GB free space (minfreespace=20G)
+    "/mnt/storage" = {
+      fsType = "fuse.mergerfs";
+      device = "/mnt/drives/DESK_1TB:/mnt/drives/LinuxData:/mnt/drives/ZeeJay_640G";
+      options = [
+        "defaults"
+        "allow_other"
+        "use_ino"
+        "cache.files=partial"
+        "category.create=mfs"
+        "minfreespace=20G"
+        "fsname=mergerfs-storage"
+        "nofail"
+      ];
+    };
   };
+
+  # Ensure mergerfs is installed
+  environment.systemPackages = [ pkgs.mergerfs ];
 
   # Samba (SMB) file sharing across the local network (Windows, Mac, Linux, TVs)
   services.samba = {
@@ -117,7 +151,21 @@ in
         "comment" = "Active and Completed Downloads";
       };
 
-      # 3. Protected shares (require 'garciamedia' SMB password: sudo smbpasswd -a garciamedia)
+      # 3. Unified MergerFS Storage Pool (All drives combined)
+      "StoragePool" = {
+        "path" = "/mnt/storage";
+        "browseable" = "yes";
+        "read only" = "no";
+        "guest ok" = "no";
+        "valid users" = "garciamedia";
+        "create mask" = "0664";
+        "directory mask" = "0775";
+        "force user" = "root";
+        "force group" = "media";
+        "comment" = "Unified Storage Pool (All SATA Drives Combined)";
+      };
+
+      # 4. Protected individual drive shares (require 'garciamedia' SMB password: sudo smbpasswd -a garciamedia)
       "SharedDrive" = mkUserShare {
         path = "/data";
         comment = "Nixflix Data Directory (NVMe)";
