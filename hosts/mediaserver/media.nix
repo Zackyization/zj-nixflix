@@ -23,9 +23,10 @@ in
   nixflix = {
     enable = true;
 
-    # Media and storage directories on the NVMe root drive
-    mediaDir = "/data/media";
-    downloadsDir = "/data/downloads";
+    # Media and storage directories on the unified MergerFS pool (/mnt/storage)
+    # State, configs, and databases remain on the fast NVMe root drive (/data/.state)
+    mediaDir = "/mnt/storage/media";
+    downloadsDir = "/mnt/storage/downloads";
     stateDir = "/data/.state";
     mediaUsers = [ "garciamedia" ];
 

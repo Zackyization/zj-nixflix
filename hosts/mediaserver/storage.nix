@@ -97,6 +97,12 @@ in
         "minfreespace=20G"
         "fsname=mergerfs-storage"
         "nofail"
+        "x-systemd.requires=mnt-drives-DESK_1TB.mount"
+        "x-systemd.requires=mnt-drives-LinuxData.mount"
+        "x-systemd.requires=mnt-drives-ZeeJay_640G.mount"
+        "x-systemd.after=mnt-drives-DESK_1TB.mount"
+        "x-systemd.after=mnt-drives-LinuxData.mount"
+        "x-systemd.after=mnt-drives-ZeeJay_640G.mount"
       ];
     };
   };
@@ -127,7 +133,7 @@ in
 
       # 1. Media Share: Movies, Shows, Music (accessible without password on home LAN)
       "Media" = {
-        "path" = "/data/media";
+        "path" = "/mnt/storage/media";
         "browseable" = "yes";
         "read only" = "no";
         "guest ok" = "yes";
@@ -140,7 +146,7 @@ in
 
       # 2. Downloads Share: Active and finished downloads
       "Downloads" = {
-        "path" = "/data/downloads";
+        "path" = "/mnt/storage/downloads";
         "browseable" = "yes";
         "read only" = "no";
         "guest ok" = "yes";
