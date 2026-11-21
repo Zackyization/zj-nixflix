@@ -67,6 +67,10 @@ in
     # Sonarr: TV show automation
     sonarr = {
       enable = true;
+      mediaDirs = [
+        "/mnt/storage/media/tv"
+        "/data/media/tv"
+      ];
       config = {
         apiKey = secrets.sonarr.apiKey;
         hostConfig = {
@@ -80,6 +84,10 @@ in
     # Radarr: Movie automation
     radarr = {
       enable = true;
+      mediaDirs = [
+        "/mnt/storage/media/movies"
+        "/data/media/movies"
+      ];
       config = {
         apiKey = secrets.radarr.apiKey;
         hostConfig = {
