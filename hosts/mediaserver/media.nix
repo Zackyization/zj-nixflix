@@ -53,9 +53,57 @@ in
       network.localNetworkAddresses = [ "0.0.0.0" ];
       apiKey = secrets.jellyfin.apiKey;
       users.admin = {
-        policy.isAdministrator = true;
+        policy = {
+          isAdministrator = true;
+          enableSubtitleManagement = true;
+        };
         password = secrets.jellyfin.adminPassword;
       };
+
+      plugins = {
+        # Multi-provider subtitle downloader (supports automatic & on-demand downloads)
+        subbuzz = {
+          enable = true;
+          config = {
+            # Providers that work out-of-the-box without an account/API key
+            EnableYifySubtitles = true;
+            EnableAddic7ed = true;
+            EnableSubf2m = true;
+            EnablePodnapisiNet = true;
+
+            # Optional: uncomment and add credentials/API keys for broader TV & movie coverage
+            # EnableOpenSubtitles = true;
+            # OpenSubUserName = "your-opensubtitles-username";
+            # OpenSubPassword = "your-opensubtitles-password";
+            # OpenSubApiKey = "your-opensubtitles-api-key";
+            # EnableSubdlCom = true;
+            # SubdlApiKey = "your-subdl-api-key";
+            # EnableSubSource = true;
+            # SubSourceApiKey = "your-subsource-api-key";
+          };
+        };
+
+        # Proactively extract embedded subtitles from video files during library scans
+        "Subtitle Extract" = {
+          enable = true;
+          config.ExtractionDuringLibraryScan = true;
+        };
+      };
+
+      libraries =
+        let
+          subtitleSettings = {
+            subtitleDownloadLanguages = [ "eng" ];
+            requirePerfectSubtitleMatch = false;
+            saveSubtitlesWithMedia = true;
+            skipSubtitlesIfEmbeddedSubtitlesPresent = true;
+            skipSubtitlesIfAudioTrackMatches = false;
+          };
+        in
+        {
+          Shows = subtitleSettings;
+          Movies = subtitleSettings;
+        };
     };
 
     # Seerr media request management (integrates with Jellyfin, Sonarr, Radarr)
