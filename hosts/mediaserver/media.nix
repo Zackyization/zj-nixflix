@@ -180,6 +180,10 @@ in
       password = secrets.qbittorrent.webPassword;
       serverConfig = {
         LegalNotice.Accepted = true;
+        BitTorrent.Session = {
+          GlobalMaxRatio = 0;
+          ShareLimitAction = "Stop";
+        };
         Preferences = {
           WebUI = {
             Address = "*";
